@@ -28,6 +28,7 @@
       width: 320px;
       text-align: center;
       animation: fadeIn 0.8s ease forwards;
+      display: none; /* Hidden until login */
     }
     h1 {
       margin: 0 0 30px 0;
@@ -150,15 +151,46 @@
       from { opacity: 0; transform: translateY(20px);}
       to { opacity: 1; transform: translateY(0);}
     }
+    /* Login container */
+    #loginContainer {
+      background: #fff;
+      border-radius: 16px;
+      padding: 40px 30px 50px 30px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.12);
+      width: 320px;
+      text-align: center;
+      animation: fadeIn 0.8s ease forwards;
+    }
+    #loginBtn {
+      padding: 15px 30px;
+      font-size: 1.2rem;
+      border-radius: 24px;
+      background-color: #ffd633;
+      border: none;
+      cursor: pointer;
+      font-weight: 700;
+      color: #222;
+      box-shadow: 0 8px 16px rgba(255, 214, 51, 0.5);
+      transition: background-color 0.3s ease;
+      user-select: none;
+    }
+    #loginBtn:hover {
+      background-color: #e6c528;
+    }
   </style>
 </head>
 <body>
-  <div id="appContainer" role="main" aria-label="Slice of Pi coin flip game">
+  <div id="loginContainer" role="main" aria-label="Login to Slice of Pi">
+    <h1>Slice of Pi</h1>
+    <button id="loginBtn" aria-label="Connect Pi Wallet to login">Connect Pi Wallet to Login</button>
+  </div>
+
+  <div id="appContainer" role="main" aria-label="Slice of Pi coin flip game" tabindex="-1">
     <h1>Slice of Pi</h1>
 
     <div id="coin" tabindex="0" aria-label="Coin showing π symbol" role="button" title="Click to flip coin">π</div>
 
-    <button id="flipBtn" aria-live="polite" aria-label="Flip Coin Button" disabled>Connect Pi Wallet to Play</button>
+    <button id="flipBtn" aria-live="polite" aria-label="Flip Coin Button" disabled>Flip Coin</button>
 
     <div id="tipJar" aria-live="polite">Tip Jar: 0 π</div>
 
@@ -185,6 +217,9 @@
     let userAddress = null;
     let testnet = false;
 
+    const loginContainer = document.getElementById('loginContainer');
+    const loginBtn = document.getElementById('loginBtn');
+    const appContainer = document.getElementById('appContainer');
     const coin = document.getElementById('coin');
     const flipBtn = document.getElementById('flipBtn');
     const tipJar = document.getElementById('tipJar');
@@ -231,7 +266,7 @@
     async function loginUser() {
       if (!window.Pi) {
         alert('Please open Slice of Pi inside the Pi Browser app.');
-        return;
+        return false;
       }
       try {
         const isAuthorized = await window.Pi.isAuthorized();
@@ -240,10 +275,16 @@
         }
         userAddress = await window.Pi.getAccount();
         updateAdminDashboard();
+        // Show main UI
+        loginContainer.style.display = 'none';
+        appContainer.style.display = 'block';
         flipBtn.disabled = false;
         flipBtn.textContent = 'Flip Coin';
+        appContainer.focus();
+        return true;
       } catch (err) {
         alert('Pi wallet authorization failed or was cancelled.');
+        return false;
       }
     }
 
@@ -321,12 +362,13 @@
       console.log(`Switched to ${testnet ? 'Testnet' : 'Mainnet'}`);
     });
 
-    window.onload = () => {
-      loginUser();
-    };
+    // Only login when user clicks login button
+    loginBtn.addEventListener('click', loginUser);
+
+    // Flip coin or connect wallet on flip button click (only works after login)
+    flipBtn.addEventListener('click', flipCoin);
 
     coin.addEventListener('click', flipCoin);
-    flipBtn.addEventListener('click', flipCoin);
   </script>
 </body>
 </html>
