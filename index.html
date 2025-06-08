@@ -147,6 +147,13 @@
     #modeToggle:hover {
       background-color: #ddd;
     }
+    #statusMsg {
+      margin-top: 20px;
+      font-size: 1rem;
+      color: #b33;
+      min-height: 1.5em;
+      user-select: none;
+    }
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(20px);}
       to { opacity: 1; transform: translateY(0);}
@@ -175,11 +182,6 @@
       user-select: none;
     }
     #loginBtn:hover {
-      background-color: #e6c528;
-    }
-    #loginBtn.loading {
-      cursor: wait;
-      opacity: 0.7;
       background-color: #e6c528;
     }
   </style>
@@ -212,6 +214,8 @@
       <div>User Wallet: <span id="userWallet">Not connected</span></div>
       <div>Mode: <span id="currentMode">Mainnet</span></div>
     </div>
+
+    <div id="statusMsg" role="alert" aria-live="assertive"></div>
   </div>
 
   <script>
@@ -233,6 +237,7 @@
     const userWalletSpan = document.getElementById('userWallet');
     const modeToggle = document.getElementById('modeToggle');
     const currentModeSpan = document.getElementById('currentMode');
+    const statusMsg = document.getElementById('statusMsg');
 
     function applyTheme(theme) {
       if (theme === 'dark') {
@@ -269,14 +274,22 @@
     }
 
     async function loginUser() {
-      loginBtn.disabled = true;
-      loginBtn.classList.add('loading');
+      statusMsg.textContent = '';
+      if (!window.Pi) {
+        statusMsg.textContent = 'Pi SDK NOT found. Please open Slice of Pi inside the Pi Browser app.';
+        console.error('Pi SDK NOT found');
+        return false;
+      }
       try {
+        statusMsg.textContent = 'Checking authorization...';
         const isAuthorized = await window.Pi.isAuthorized();
         if (!isAuthorized) {
+          statusMsg.textContent = 'Requesting Pi wallet authorization...';
           await window.Pi.requestAuthorization();
         }
         userAddress = await window.Pi.getAccount();
+        statusMsg.textContent = `Logged in as ${userAddress}`;
+        console.log('User address:', userAddress);
         updateAdminDashboard();
         // Show main UI
         loginContainer.style.display = 'none';
@@ -284,34 +297,40 @@
         flipBtn.disabled = false;
         flipBtn.textContent = 'Flip Coin';
         appContainer.focus();
-        loginBtn.disabled = false;
-        loginBtn.classList.remove('loading');
         return true;
       } catch (err) {
+        statusMsg.textContent = 'Pi wallet authorization failed or was cancelled.';
         alert('Pi wallet authorization failed or was cancelled.');
-        loginBtn.disabled = false;
-        loginBtn.classList.remove('loading');
+        console.error('Login error:', err);
         return false;
       }
     }
 
     async function sendPiTransaction(to, amount, memo) {
       if (testnet) {
-        // Simulated transaction on testnet mode
+        statusMsg.textContent = `[TESTNET] Simulating sending ${amount} Pi to ${to}`;
         console.log(`[TESTNET] Sending ${amount} Pi to ${to} with memo "${memo}"`);
         return true;
       }
+      if (!window.Pi) {
+        statusMsg.textContent = 'Pi SDK not found. Use Pi Browser.';
+        alert('Pi SDK not found. Use Pi Browser.');
+        return false;
+      }
       try {
+        statusMsg.textContent = `Sending ${amount} Pi to ${to}...`;
         const res = await window.Pi.sendTransaction({
           recipient: to,
           amount: amount,
           memo: memo
         });
+        statusMsg.textContent = 'Transaction successful!';
         console.log('Transaction sent:', res);
         return true;
       } catch (e) {
-        console.error('Transaction error:', e);
+        statusMsg.textContent = 'Transaction failed or cancelled.';
         alert('Transaction failed or cancelled.');
+        console.error('Transaction error:', e);
         return false;
       }
     }
@@ -350,6 +369,7 @@
         updateAdminDashboard();
 
       } catch (error) {
+        statusMsg.textContent = 'Error during coin flip: ' + error.message;
         alert('Error during coin flip: ' + error.message);
       } finally {
         flipping = false;
