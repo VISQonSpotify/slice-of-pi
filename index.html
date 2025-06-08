@@ -177,6 +177,11 @@
     #loginBtn:hover {
       background-color: #e6c528;
     }
+    #loginBtn.loading {
+      cursor: wait;
+      opacity: 0.7;
+      background-color: #e6c528;
+    }
   </style>
 </head>
 <body>
@@ -264,8 +269,14 @@
     }
 
     async function loginUser() {
+      loginBtn.disabled = true;
+      loginBtn.classList.add('loading');
+      console.log('window.Pi:', window.Pi);
+      await new Promise(r => setTimeout(r, 200)); // Wait for SDK to be ready
       if (!window.Pi) {
         alert('Please open Slice of Pi inside the Pi Browser app.');
+        loginBtn.disabled = false;
+        loginBtn.classList.remove('loading');
         return false;
       }
       try {
@@ -281,9 +292,13 @@
         flipBtn.disabled = false;
         flipBtn.textContent = 'Flip Coin';
         appContainer.focus();
+        loginBtn.disabled = false;
+        loginBtn.classList.remove('loading');
         return true;
       } catch (err) {
         alert('Pi wallet authorization failed or was cancelled.');
+        loginBtn.disabled = false;
+        loginBtn.classList.remove('loading');
         return false;
       }
     }
