@@ -1,27 +1,36 @@
-import React from 'react';
+import React, { useEffect, useState } from "react";
 
-// This assumes the Pi SDK is already loaded via the Pi Browser
-const WalletConnect = ({ onConnect }) => {
-  const handleLogin = async () => {
+const WalletConnect = () => {
+  const [user, setUser] = useState(null);
+
+  const handleSignIn = async () => {
+    if (!window.Pi) {
+      alert("Pi Network SDK not found. Please open in Pi Browser.");
+      return;
+    }
+
     try {
-      const scopes = ['username', 'payments'];
-      const authResult = await window.Pi.authenticate(scopes, (result) => {
-        console.log('Approved scopes: ', result);
-      });
-
-      if (authResult) {
-        onConnect(authResult); // Pass wallet info up to App
-      }
+      const scopes = ["payments"];
+      const result = await window.Pi.authenticate(scopes, onIncompletePaymentFound);
+      setUser(result.user);
     } catch (error) {
-      console.error('Wallet login failed:', error);
-      alert('Pi Wallet login failed. Make sure you’re using the Pi Browser.');
+      console.error("Pi Authentication Error:", error);
+      alert("Authentication failed.");
     }
   };
 
+  const onIncompletePaymentFound = (payment) => {
+    console.log("Incomplete payment found:", payment);
+    // Optional: handle restoring payment status
+  };
+
   return (
-    <div className="wallet-connect">
-      <h2>Connect Your Pi Wallet</h2>
-      <button onClick={handleLogin}>Login with Pi</button>
+    <div>
+      {user ? (
+        <p>Welcome, {user.username}!</p>
+      ) : (
+        <button onClick={handleSignIn}>Sign in with Pi</button>
+      )}
     </div>
   );
 };
