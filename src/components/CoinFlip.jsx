@@ -9,8 +9,7 @@ const CoinFlip = ({ walletInfo }) => {
   const [betAmount, setBetAmount] = useState(0.01);
 
   const flipCoin = () => {
-    const outcome = Math.random() < 0.5 ? 'heads' : 'tails';
-    return outcome;
+    return Math.random() < 0.5 ? 'heads' : 'tails';
   };
 
   const handleFlip = async () => {
@@ -23,23 +22,44 @@ const CoinFlip = ({ walletInfo }) => {
     setMessage('');
 
     const outcome = flipCoin();
-    setResult(outcome);
+    const didWin = outcome === choice;
 
-    const win = outcome === choice;
+    try {
+      const response = await fetch('http://localhost:5000/flip-result', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: walletInfo.user.username,
+          amount: betAmount,
+          won: didWin,
+          streak,
+        }),
+      });
 
-    if (win) {
-      const newStreak = streak + 1;
-      setStreak(newStreak);
-      const payout = betAmount * Math.pow(2, newStreak);
-      setMessage(`🎉 You won! Streak: ${newStreak}. Payout: ${payout.toFixed(2)} Pi`);
+      const data = await response.json();
 
-      // TODO: Trigger backend payment via Pi SDK here
-    } else {
-      setMessage(`❌ You lost. Streak ended. Better luck next time!`);
-      setStreak(0);
+      if (!response.ok) {
+        throw new Error(data.error || 'Backend error');
+      }
+
+      if (didWin) {
+        const newStreak = streak + 1;
+        setStreak(newStreak);
+        setMessage(`🎉 You won! Result: ${outcome}. Streak: ${newStreak}. Payout: ${data.payout.toFixed(2)} Pi`);
+      } else {
+        setStreak(0);
+        setMessage(`❌ You lost! Result: ${outcome}. Streak reset.`);
+      }
+
+      setResult(outcome);
+    } catch (err) {
+      console.error(err);
+      setMessage(`⚠️ Error: ${err.message}`);
+    } finally {
+      setIsFlipping(false);
     }
-
-    setIsFlipping(false);
   };
 
   const reset = () => {
