@@ -2,58 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Slice of Pi - Welcome</title>
-  <link rel="stylesheet" href="styles.css" />
-  <style>
-    /* Minimal styling just for landing */
-    body, html {
-      height: 100%;
-      margin: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background: #f7f5f0;
-      color: #222;
-      user-select: none;
-    }
-    #landingContainer {
-      background: #fff;
-      border-radius: 16px;
-      padding: 40px 30px;
-      box-shadow: 0 8px 16px rgba(0,0,0,0.12);
-      width: 320px;
-      text-align: center;
-    }
-    h1 {
-      margin-bottom: 30px;
-      font-weight: 700;
-      font-size: 1.8rem;
-      letter-spacing: 2px;
-      color: #222;
-    }
-    a#enterAppBtn {
-      display: inline-block;
-      padding: 15px 30px;
-      font-size: 1.2rem;
-      border-radius: 24px;
-      background-color: #ffd633;
-      color: #222;
-      font-weight: 700;
-      text-decoration: none;
-      box-shadow: 0 8px 16px rgba(255, 214, 51, 0.5);
-      transition: background-color 0.3s ease;
-      user-select: none;
-    }
-    a#enterAppBtn:hover {
-      background-color: #e6c528;
-    }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Slice of Pi</title>
 </head>
 <body>
-  <div id="landingContainer" role="main" aria-label="Welcome to Slice of Pi">
-    <h1>Slice of Pi</h1>
-    <a id="enterAppBtn" href="app.html" role="button" aria-label="Enter Slice of Pi Game">Enter Slice of Pi Game</a>
-  </div>
+  <div id="root"></div>
+  <script type="module" src="/src/main.jsx"></script>
 </body>
 </html>
