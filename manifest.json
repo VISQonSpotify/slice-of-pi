@@ -1,0 +1,18 @@
+{
+  "name": "Slice of Pi",
+  "description": "Flip for a chance to multiply your Pi. Simple, addicting, and on-chain.",
+  "version": "1.0.0",
+  "developer": {
+    "name": "De'Andre Bush",
+    "url": "https://slice-of-pi.onrender.com"
+  },
+  "main": "https://slice-of-pi.onrender.com",
+  "permissions": [
+    "payments"
+  ],
+  "redirect": {
+    "sign_in": "https://slice-of-pi.onrender.com",
+    "sign_out": "https://slice-of-pi.onrender.com"
+  },
+  "chain": "Pi"
+}
