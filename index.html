@@ -106,6 +106,30 @@
       0%, 100% { opacity: 1; }
       50% { opacity: 0.3; }
     }
+    #verifyPaymentBtn {
+      margin-top: 20px;
+      padding: 12px 30px;
+      font-size: 1rem;
+      border-radius: 24px;
+      background-color: #5a2a83;
+      border: none;
+      color: #fff;
+      cursor: pointer;
+      font-weight: 700;
+      box-shadow: 0 8px 16px rgba(90, 42, 131, 0.7);
+      transition: background-color 0.3s ease;
+      user-select: none;
+    }
+    #verifyPaymentBtn:hover {
+      background-color: #7a43bd;
+    }
+    #verifyStatus {
+      margin-top: 12px;
+      font-size: 0.9rem;
+      color: #444;
+      min-height: 1.2em;
+      user-select: none;
+    }
     #themeSelector {
       margin-top: 24px;
       font-size: 0.95rem;
@@ -194,6 +218,9 @@
 
     <div id="tipJar" aria-live="polite">Tip Jar: 0 π</div>
 
+    <button id="verifyPaymentBtn" aria-label="Send verification payment to app wallet">Send Verification Payment</button>
+    <div id="verifyStatus" aria-live="polite"></div>
+
     <select id="themeSelector" aria-label="Select theme">
       <option value="light" selected>Light Theme</option>
       <option value="dark">Dark Theme</option>
@@ -223,6 +250,8 @@
     const coin = document.getElementById('coin');
     const flipBtn = document.getElementById('flipBtn');
     const tipJar = document.getElementById('tipJar');
+    const verifyPaymentBtn = document.getElementById('verifyPaymentBtn');
+    const verifyStatus = document.getElementById('verifyStatus');
     const themeSelector = document.getElementById('themeSelector');
     const adminDashboard = document.getElementById('adminDashboard');
     const userWalletSpan = document.getElementById('userWallet');
@@ -263,24 +292,11 @@
       setTimeout(() => tipJar.classList.remove('blink'), 1200);
     }
 
-    async function waitForPiSDK(timeout = 5000) {
-      const start = Date.now();
-      while (!window.Pi) {
-        if (Date.now() - start > timeout) {
-          return false;
-        }
-        await new Promise(r => setTimeout(r, 100));
-      }
-      return true;
-    }
-
     async function loginUser() {
-      const hasPiSDK = await waitForPiSDK();
-      if (!hasPiSDK) {
-        alert('Please open this app inside the Pi Browser.');
+      if (!window.Pi) {
+        alert('Please open Slice of Pi inside the Pi Browser app.');
         return false;
       }
-
       try {
         const isAuthorized = await window.Pi.isAuthorized();
         if (!isAuthorized) {
@@ -288,7 +304,7 @@
         }
         userAddress = await window.Pi.getAccount();
         updateAdminDashboard();
-
+        // Show main UI
         loginContainer.style.display = 'none';
         appContainer.style.display = 'block';
         flipBtn.disabled = false;
@@ -303,6 +319,7 @@
 
     async function sendPiTransaction(to, amount, memo) {
       if (testnet) {
+        // Simulated transaction on testnet mode
         console.log(`[TESTNET] Sending ${amount} Pi to ${to} with memo "${memo}"`);
         return true;
       }
@@ -332,21 +349,26 @@
       coin.classList.add('flipping');
 
       try {
+        // Send bet of 0.01 Pi to liquidity pool wallet
         const liquidityWallet = 'GCQGGFVKWEIV2L6QV3SSGVF3V6KYS4ARBHHAGOSPBA3CCPWONIYCU6FX';
         const betAmount = 0.01;
 
         const betSuccess = await sendPiTransaction(liquidityWallet, betAmount, 'Slice of Pi bet');
         if (!betSuccess) throw new Error('Bet transaction failed');
 
+        // Wait flip animation
         await new Promise(r => setTimeout(r, 1000));
 
+        // Determine random outcome
         const outcome = Math.random() < 0.5 ? 'Heads' : 'Tails';
         alert(`Coin landed on ${outcome}!`);
 
+        // Simulated payout (payout > bet to simulate win)
         const payoutAmount = 0.018;
         const payoutSuccess = await sendPiTransaction(userAddress, payoutAmount, 'Slice of Pi payout');
         if (!payoutSuccess) throw new Error('Payout transaction failed');
 
+        // Update local state
         totalRevenue += betAmount;
         tipJarAmount += 0.005;
         liquidityPool += (betAmount - payoutAmount);
@@ -369,9 +391,34 @@
       console.log(`Switched to ${testnet ? 'Testnet' : 'Mainnet'}`);
     });
 
+    // Only login when user clicks login button
     loginBtn.addEventListener('click', loginUser);
+
+    // Flip coin or connect wallet on flip button click (only works after login)
     flipBtn.addEventListener('click', flipCoin);
-    coin.addEventListener('click', flipCoin);
+
+    // New: Verification payment button handler
+    verifyPaymentBtn.addEventListener('click', async () => {
+      if (!window.Pi) {
+        alert('Please open inside Pi Browser to send verification payment.');
+        return;
+      }
+      const appWallet = 'GCQGGFVKWEIV2L6QV3SSGVF3V6KYS4ARBHHAGOSPBA3CCPWONIYCU6FX'; // Your app wallet
+      try {
+        verifyPaymentBtn.disabled = true;
+        verifyStatus.textContent = 'Waiting for payment confirmation...';
+        await window.Pi.sendTransaction({
+          recipient: appWallet,
+          amount: 0.0001,
+          memo: 'App ownership verification'
+        });
+        verifyStatus.textContent = 'Payment sent! Verification should complete soon.';
+      } catch (e) {
+        verifyStatus.textContent = 'Payment failed or cancelled.';
+      } finally {
+        verifyPaymentBtn.disabled = false;
+      }
+    });
   </script>
 </body>
 </html>
