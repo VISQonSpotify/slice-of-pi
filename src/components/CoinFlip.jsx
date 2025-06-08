@@ -1,92 +1,56 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
+import axios from "axios";
 
 const CoinFlip = ({ walletInfo }) => {
-  const [choice, setChoice] = useState(null);
+  const [status, setStatus] = useState("Ready");
   const [result, setResult] = useState(null);
-  const [streak, setStreak] = useState(0);
-  const [isFlipping, setIsFlipping] = useState(false);
-  const [message, setMessage] = useState('');
-  const [betAmount, setBetAmount] = useState(0.01);
 
-  const flipCoin = () => {
-    return Math.random() < 0.5 ? 'heads' : 'tails';
-  };
+  const flipCoin = async () => {
+    const amount = 0.01;
+    const won = Math.random() < 0.5; // basic 50/50 flip
+    const streak = 1; // adjust if implementing double-or-nothing
 
-  const handleFlip = async () => {
-    if (!choice) {
-      setMessage('Choose heads or tails first!');
-      return;
-    }
-
-    setIsFlipping(true);
-    setMessage('');
-
-    const outcome = flipCoin();
-    const didWin = outcome === choice;
+    setStatus("Flipping...");
 
     try {
-      const response = await fetch('http://localhost:5000/flip-result', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          username: walletInfo.user.username,
-          amount: betAmount,
-          won: didWin,
-          streak,
-        }),
+      const payment = await window.Pi.createPayment({
+        amount: amount.toString(),
+        memo: `Coin flip game`,
+        metadata: { type: "coin_flip", won },
+        to: "your-pi-wallet-username", // <-- replace with YOUR Pi username
       });
 
-      const data = await response.json();
+      if (payment.status === "COMPLETED") {
+        // Notify your backend
+        const response = await axios.post("/flip-result", {
+          username: walletInfo.username,
+          amount,
+          won,
+          streak,
+        });
 
-      if (!response.ok) {
-        throw new Error(data.error || 'Backend error');
-      }
-
-      if (didWin) {
-        const newStreak = streak + 1;
-        setStreak(newStreak);
-        setMessage(`🎉 You won! Result: ${outcome}. Streak: ${newStreak}. Payout: ${data.payout.toFixed(2)} Pi`);
+        setResult(response.data);
+        setStatus("Flip complete.");
       } else {
-        setStreak(0);
-        setMessage(`❌ You lost! Result: ${outcome}. Streak reset.`);
+        setStatus("Payment cancelled.");
       }
-
-      setResult(outcome);
     } catch (err) {
-      console.error(err);
-      setMessage(`⚠️ Error: ${err.message}`);
-    } finally {
-      setIsFlipping(false);
+      console.error("Payment error:", err);
+      setStatus("Error during flip.");
     }
-  };
-
-  const reset = () => {
-    setChoice(null);
-    setResult(null);
-    setMessage('');
   };
 
   return (
-    <div className="coin-flip-game">
-      <h2>Welcome, @{walletInfo.user.username}</h2>
-
-      <div className="choice-buttons">
-        <button onClick={() => setChoice('heads')}>Heads</button>
-        <button onClick={() => setChoice('tails')}>Tails</button>
-      </div>
-
-      <p>Your choice: <strong>{choice || '—'}</strong></p>
-
-      <button onClick={handleFlip} disabled={isFlipping || !choice}>
-        {isFlipping ? 'Flipping...' : 'Flip the Coin'}
-      </button>
-
-      {result && <p>🪙 Result: <strong>{result}</strong></p>}
-      <p>{message}</p>
-
-      <button onClick={reset}>Reset</button>
+    <div>
+      <p>Status: {status}</p>
+      <button onClick={flipCoin}>Flip Coin (0.01 π)</button>
+      {result && (
+        <p>
+          {result.success
+            ? `You ${result.payout > 0 ? "won" : "lost"} ${result.payout} π!`
+            : "Flip failed."}
+        </p>
+      )}
     </div>
   );
 };
