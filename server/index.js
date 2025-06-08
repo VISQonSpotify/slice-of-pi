@@ -9,7 +9,7 @@ app.use(cors());
 app.use(express.json());
 
 const liquidityPool = {
-  balance: 100, // Starting liquidity in Pi (for testing)
+  balance: 100, // Starting liquidity in Pi
 };
 
 const gameLogs = [];
@@ -48,4 +48,13 @@ app.post('/flip-result', (req, res) => {
 });
 
 app.get('/admin/stats', (req, res) => {
-  res.j
+  res.json({
+    liquidity: liquidityPool.balance,
+    totalGames: gameLogs.length,
+    logs: gameLogs,
+  });
+});
+
+app.listen(port, () => {
+  console.log(`Slice of Pi backend listening at http://localhost:${port}`);
+});
