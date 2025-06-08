@@ -271,14 +271,6 @@
     async function loginUser() {
       loginBtn.disabled = true;
       loginBtn.classList.add('loading');
-      console.log('window.Pi:', window.Pi);
-      await new Promise(r => setTimeout(r, 200)); // Wait for SDK to be ready
-      if (!window.Pi) {
-        alert('Please open Slice of Pi inside the Pi Browser app.');
-        loginBtn.disabled = false;
-        loginBtn.classList.remove('loading');
-        return false;
-      }
       try {
         const isAuthorized = await window.Pi.isAuthorized();
         if (!isAuthorized) {
@@ -308,10 +300,6 @@
         // Simulated transaction on testnet mode
         console.log(`[TESTNET] Sending ${amount} Pi to ${to} with memo "${memo}"`);
         return true;
-      }
-      if (!window.Pi) {
-        alert('Pi SDK not found. Use Pi Browser.');
-        return false;
       }
       try {
         const res = await window.Pi.sendTransaction({
