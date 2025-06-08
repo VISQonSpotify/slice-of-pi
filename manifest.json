@@ -3,16 +3,16 @@
   "description": "Flip for a chance to multiply your Pi. Simple, addicting, and on-chain.",
   "version": "1.0.0",
   "developer": {
-    "name": "De'Andre Bush",
-    "url": "https://slice-of-pi.onrender.com"
+    "name": "stacking.pi π",
+    "url": "https://sliceofpi.app"
   },
-  "main": "https://slice-of-pi.onrender.com",
+  "main": "https://sliceofpi.app",
   "permissions": [
     "payments"
   ],
   "redirect": {
-    "sign_in": "https://slice-of-pi.onrender.com",
-    "sign_out": "https://slice-of-pi.onrender.com"
+    "sign_in": "https://sliceofpi.app",
+    "sign_out": "https://sliceofpi.app"
   },
   "chain": "Pi"
 }
