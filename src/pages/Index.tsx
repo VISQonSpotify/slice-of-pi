@@ -1,9 +1,8 @@
-
 import { useState } from "react";
-import { PiAuth } from "@/components/PiAuth";
-import { GameTabs } from "@/components/GameTabs";
-import { Leaderboard } from "@/components/Leaderboard";
-import { AdminDashboard } from "@/components/AdminDashboard";
+import { PiAuth } from "../components/PiAuth";
+import { GameTabs } from "../components/GameTabs";
+import { Leaderboard } from "../components/Leaderboard";
+import { AdminDashboard } from "../components/AdminDashboard";
 
 const Index = () => {
   const [user, setUser] = useState(null);
