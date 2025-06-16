@@ -1,57 +1,37 @@
 
-import React from 'react';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface GameTabsProps {
-  activeTab: 'game' | 'leaderboard' | 'admin';
-  onTabChange: (tab: 'game' | 'leaderboard' | 'admin') => void;
-  isAdmin?: boolean;
+  user: any;
 }
 
-const GameTabs = ({ activeTab, onTabChange, isAdmin = false }: GameTabsProps) => {
+export const GameTabs = ({ user }: GameTabsProps) => {
   return (
-    <div className="flex justify-center">
-      <div className="bg-white/60 backdrop-blur-sm rounded-xl p-1 flex space-x-1 shadow-sm border border-stone-200">
-        <Button
-          onClick={() => onTabChange('game')}
-          className={`px-6 py-2 rounded-lg font-medium transition-all duration-200 ${
-            activeTab === 'game' 
-              ? 'bg-stone-800 text-white shadow-sm' 
-              : 'bg-transparent text-stone-600 hover:bg-stone-100 hover:text-stone-800'
-          }`}
-          variant="ghost"
-        >
-          game
-        </Button>
-        
-        <Button
-          onClick={() => onTabChange('leaderboard')}
-          className={`px-6 py-2 rounded-lg font-medium transition-all duration-200 ${
-            activeTab === 'leaderboard' 
-              ? 'bg-stone-800 text-white shadow-sm' 
-              : 'bg-transparent text-stone-600 hover:bg-stone-100 hover:text-stone-800'
-          }`}
-          variant="ghost"
-        >
-          leaderboard
-        </Button>
-        
-        {isAdmin && (
-          <Button
-            onClick={() => onTabChange('admin')}
-            className={`px-6 py-2 rounded-lg font-medium transition-all duration-200 ${
-              activeTab === 'admin' 
-                ? 'bg-stone-800 text-white shadow-sm' 
-                : 'bg-transparent text-stone-600 hover:bg-stone-100 hover:text-stone-800'
-            }`}
-            variant="ghost"
-          >
-            admin
-          </Button>
-        )}
-      </div>
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>🎮 Games</CardTitle>
+          <CardDescription>
+            Choose your game and start playing!
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid md:grid-cols-2 gap-4">
+            <Card className="p-4 hover:shadow-md transition-shadow cursor-pointer">
+              <h3 className="font-semibold mb-2">🪙 Coin Flip</h3>
+              <p className="text-sm text-gray-600">
+                Simple heads or tails game
+              </p>
+            </Card>
+            <Card className="p-4 hover:shadow-md transition-shadow cursor-pointer">
+              <h3 className="font-semibold mb-2">💰 Double or Nothing</h3>
+              <p className="text-sm text-gray-600">
+                Risk it all for double rewards
+              </p>
+            </Card>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
-
-export default GameTabs;
