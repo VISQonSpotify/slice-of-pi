@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { PiAuth } from "../components/PiAuth";
 import { GameTabs } from "../components/GameTabs";
@@ -31,7 +32,14 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50">
       <div className="container mx-auto px-4 py-8">
         <header className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-800 mb-2">🥧 Slice of Pi</h1>
+          <div className="flex justify-center items-center gap-4 mb-2">
+            <img 
+              src="/lovable-uploads/bb6cb286-a393-4001-a185-df803348acda.png" 
+              alt="Slice of Pi Logo" 
+              className="w-12 h-12 object-contain"
+            />
+            <h1 className="text-4xl font-bold text-gray-800">Slice of Pi</h1>
+          </div>
           <p className="text-gray-600">Welcome back, {user.username}!</p>
         </header>
 

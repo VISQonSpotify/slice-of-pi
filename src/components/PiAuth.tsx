@@ -91,7 +91,13 @@ export const PiAuth = ({ onAuth }: PiAuthProps) => {
     <div className="flex items-center justify-center min-h-screen p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center space-y-4">
-          <div className="text-6xl">🥧</div>
+          <div className="flex justify-center">
+            <img 
+              src="/lovable-uploads/bb6cb286-a393-4001-a185-df803348acda.png" 
+              alt="Slice of Pi Logo" 
+              className="w-20 h-20 object-contain"
+            />
+          </div>
           <CardTitle className="text-2xl font-bold text-gray-800">
             Welcome to Slice of Pi
           </CardTitle>
