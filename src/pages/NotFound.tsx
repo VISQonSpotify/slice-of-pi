@@ -1,29 +1,40 @@
 
-import { Button } from "../components/ui/button"
-import { Home } from "lucide-react"
-import { Link } from "react-router-dom"
+import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
+import { Button } from "../components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 const NotFound = () => {
+  const navigate = useNavigate();
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
-      <div className="text-center space-y-6 p-8">
-        <div className="space-y-2">
-          <h1 className="text-6xl font-bold text-gray-900">404</h1>
-          <h2 className="text-2xl font-semibold text-gray-700">Page Not Found</h2>
-          <p className="text-gray-500 max-w-md mx-auto">
-            Sorry, we couldn't find the page you're looking for. It might have been moved or deleted.
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 flex items-center justify-center p-4">
+      <Card className="w-full max-w-md text-center">
+        <CardHeader>
+          <div className="flex justify-center mb-4">
+            <img 
+              src="/lovable-uploads/bb6cb286-a393-4001-a185-df803348acda.png" 
+              alt="Slice of Pi Logo" 
+              className="w-16 h-16 object-contain"
+            />
+          </div>
+          <CardTitle className="text-2xl font-bold text-gray-800">
+            404 - Page Not Found
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-gray-600">
+            Looks like this slice of pi doesn't exist!
           </p>
-        </div>
-        
-        <Link to="/">
-          <Button className="inline-flex items-center gap-2">
-            <Home className="w-4 h-4" />
+          <Button 
+            onClick={() => navigate("/")}
+            className="w-full bg-purple-600 hover:bg-purple-700"
+          >
             Back to Home
           </Button>
-        </Link>
-      </div>
+        </CardContent>
+      </Card>
     </div>
-  )
-}
+  );
+};
 
-export default NotFound
+export default NotFound;
