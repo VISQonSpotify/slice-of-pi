@@ -1,40 +1,67 @@
 
-// Pi Network Configuration
-// Update these values when you get your real App ID from develop.pi
-
-export interface PiNetworkConfig {
-  appId: string;
-  sandbox: boolean;
-  version: string;
-}
-
-// Environment configurations
-export const PI_CONFIG = {
-  // Sandbox configuration (for testing)
-  sandbox: {
-    appId: 'your-real-app-id-here', // Replace with your actual App ID from develop.pi
-    sandbox: true,
-    version: '2.0'
-  } as PiNetworkConfig,
+// Pi Network SDK Configuration
+export const PI_NETWORK_CONFIG = {
+  // Sandbox environment for development
+  sandbox: true,
   
-  // Production configuration (for live app)
-  production: {
-    appId: 'your-real-app-id-here', // Replace with your actual App ID from develop.pi
-    sandbox: false,
-    version: '2.0'
-  } as PiNetworkConfig
+  // Required scopes for the application
+  scopes: ['username', 'payments'],
+  
+  // App-specific configuration
+  app: {
+    name: 'Slice of Pi',
+    description: 'Coin flip game with Pi cryptocurrency',
+    version: '1.0.0'
+  }
 };
 
-// Current environment - change this to switch between sandbox and production
-// Set to 'sandbox' for testing, 'production' for live app
-export const CURRENT_ENV: 'sandbox' | 'production' = 'sandbox';
-
-// Get current configuration
-export const getCurrentPiConfig = (): PiNetworkConfig => {
-  return PI_CONFIG[CURRENT_ENV];
+// Pi Network API endpoints
+export const PI_API_ENDPOINTS = {
+  sandbox: 'https://api.minepi.com/v2',
+  production: 'https://api.minepi.com/v2'
 };
 
-// Helper to check if we're in sandbox mode
-export const isSandboxMode = (): boolean => {
-  return getCurrentPiConfig().sandbox;
+// Game configuration
+export const GAME_CONFIG = {
+  coinFlip: {
+    minBet: 0.1,
+    maxBet: 100,
+    payoutMultiplier: 2
+  },
+  doubleOrNothing: {
+    entryFee: 1,
+    maxRounds: 5,
+    winProbability: 0.5
+  }
+};
+
+// Helper function to check if Pi SDK is available
+export const isPiSDKAvailable = (): boolean => {
+  return typeof window !== 'undefined' && !!(window as any).Pi;
+};
+
+// Helper function to initialize Pi SDK
+export const initializePiSDK = (): Promise<boolean> => {
+  return new Promise((resolve) => {
+    if (isPiSDKAvailable()) {
+      resolve(true);
+      return;
+    }
+
+    // Wait for SDK to load
+    let attempts = 0;
+    const maxAttempts = 30; // 30 seconds max wait
+    
+    const checkSDK = setInterval(() => {
+      attempts++;
+      
+      if (isPiSDKAvailable()) {
+        clearInterval(checkSDK);
+        resolve(true);
+      } else if (attempts >= maxAttempts) {
+        clearInterval(checkSDK);
+        resolve(false);
+      }
+    }, 1000);
+  });
 };
